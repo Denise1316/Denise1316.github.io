@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>后宫宫斗攻略系统 - 登录</title>
+  <!-- Tailwind CSS v3 -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome -->
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#C41E3A', // 宫墙红
+            secondary: '#D4AF37', // 皇家金
+            tertiary: '#1D3557', // 深蓝
+            accent: '#6A0572', // 紫色
+            light: '#F8F9FA', // 米白
+            dark: '#343A40', // 深灰
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            serif: ['"Noto Serif SC"', 'serif'],
+          },
+          backgroundImage: {
+            'scroll-pattern': "url('https://p26-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/f636ed43800c4b5e9e37b190b13e5024.jpg~tplv-a9rns2rl98-24:720:720.image?rcl=202511091856171AECC3B59E497457B4AF&rk3s=8e244e95&rrcfp=8a172a1a&x-expires=1763290578&x-signature=iSNZJJUsr1GTci8KIgashcWdvSw%3D')",
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .text-shadow {
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      }
+      .text-shadow-lg {
+        text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
+      }
+      .border-gold {
+        border-image: linear-gradient(to right, #D4AF37, #FFD700, #D4AF37) 1;
+      }
+      .scroll-reveal {
+        animation: scrollReveal 1s ease-out forwards;
+      }
+      .float {
+        animation: float 3s ease-in-out infinite;
+      }
+      .pulse-slow {
+        animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      }
+    }
+    
+    @keyframes scrollReveal {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+    
+    body {
+      background-color: #0F172A;
+      font-family: 'Noto Serif SC', serif;
+    }
+    
+    .login-container {
+      background-image: url('https://p26-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/f636ed43800c4b5e9e37b190b13e5024.jpg~tplv-a9rns2rl98-24:720:720.image?rcl=202511091856171AECC3B59E497457B4AF&rk3s=8e244e95&rrcfp=8a172a1a&x-expires=1763290578&x-signature=iSNZJJUsr1GTci8KIgashcWdvSw%3D');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+    
+    .login-card {
+      background-color: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+    }
+    
+    .login-input {
+      background-color: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: white;
+      transition: all 0.3s ease;
+    }
+    
+    .login-input:focus {
+      background-color: rgba(255, 255, 255, 0.2);
+      border: 1px solid #D4AF37;
+      box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+    }
+    
+    .login-button {
+      background: linear-gradient(135deg, #D4AF37, #FFD700);
+      color: #1D3557;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .login-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: all 0.6s ease;
+    }
+    
+    .login-button:hover::before {
+      left: 100%;
+    }
+    
+    .login-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    .login-button:active {
+      transform: translateY(-1px);
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+    }
+    
+    .role-option {
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .role-option:hover {
+      transform: scale(1.05);
+    }
+    
+    .role-option.selected {
+      border: 2px solid #D4AF37;
+      box-shadow: 0 0 15px rgba(212, 175, 55, 0.7);
+    }
+    
+    .role-option img {
+      filter: grayscale(30%);
+      transition: all 0.3s ease;
+    }
+    
+    .role-option.selected img {
+      filter: grayscale(0%);
+    }
+    
+    .title-animation {
+      animation: titleFade 2s ease-out forwards;
+    }
+    
+    @keyframes titleFade {
+      from {
+        opacity: 0;
+        transform: translateY(-50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .subtitle-animation {
+      animation: subtitleFade 2s ease-out 0.5s forwards;
+      opacity: 0;
+    }
+    
+    @keyframes subtitleFade {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .card-animation {
+      animation: cardFade 1.5s ease-out 1s forwards;
+      opacity: 0;
+    }
+    
+    @keyframes cardFade {
+      from {
+        opacity: 0;
+        transform: scale(0.9);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+  <div class="login-container w-full max-w-6xl h-screen flex items-center justify-center relative overflow-hidden">
+    <!-- 装饰元素 -->
+    <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+      <div class="absolute top-10 left-10 w-20 h-20 rounded-full bg-primary/20 blur-3xl"></div>
+      <div class="absolute bottom-10 right-10 w-32 h-32 rounded-full bg-secondary/20 blur-3xl"></div>
+      <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full bg-tertiary/10 blur-3xl"></div>
+    </div>
+    
+    <!-- 标题 -->
+    <div class="absolute top-10 left-1/2 transform -translate-x-1/2 text-center z-10">
+     
+    </div>
+    
+    <!-- 登录卡片 -->
+    <div class="login-card rounded-2xl p-8 w-full max-w-md card-animation">
+      <h2 class="text-3xl font-bold text-center mb-8 text-white text-shadow">入宫</h2>
+      
+      <form id="loginForm" class="space-y-6">
+        <div>
+          <label for="username" class="block text-white mb-2 text-lg">姓名</label>
+          <input type="text" id="username" class="login-input w-full px-4 py-3 rounded-lg focus:outline-none" placeholder="请输入你的芳名" required>
+        </div>
+        
+        <div>
+          <label for="password" class="block text-white mb-2 text-lg">暗号</label>
+          <input type="password" id="password" class="login-input w-full px-4 py-3 rounded-lg focus:outline-none" placeholder="请输入入宫暗号" required>
+        </div>
+        
+        <div>
+          <label class="block text-white mb-4 text-lg">选择身份</label>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="role-option selected rounded-xl overflow-hidden">
+              <img src="images/秀女.webp" alt="秀女" class="w-full h-32 object-cover">
+              <div class="bg-tertiary/80 p-2 text-center">
+                <p class="text-white font-bold">秀女</p>
+                <p class="text-white/70 text-sm">家世清白，初入宫闱</p>
+              </div>
+            </div>
+            
+            <div class="role-option rounded-xl overflow-hidden">
+              <img src="images/宫女.png" alt="宫女" class="w-full h-32 object-cover">
+              <div class="bg-tertiary/80 p-2 text-center">
+                <p class="text-white font-bold">宫女</p>
+                <p class="text-white/70 text-sm">身份低微，步步为营</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="pt-4">
+          <button type="submit" class="login-button w-full py-3 px-6 rounded-lg text-lg font-bold">
+            踏入宫廷
+          </button>
+        </div>
+      </form>
+      
+      <div class="mt-6 text-center">
+        <p class="text-white/70">初次入宫？<a href="#" class="text-secondary hover:underline">了解规则</a></p>
+      </div>
+    </div>
+    
+    <!-- 底部信息 -->
+    <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-center text-white/50 text-sm">
+      <p>后宫之中，步步惊心，处处玄机</p>
+    </div>
+  </div>
+
+  <script>
+    // 角色选择功能
+    document.addEventListener('DOMContentLoaded', function() {
+      const roleOptions = document.querySelectorAll('.role-option');
+      let selectedRole = '秀女';
+      
+      roleOptions.forEach(option => {
+        option.addEventListener('click', function() {
+          // 移除所有选中状态
+          roleOptions.forEach(opt => opt.classList.remove('selected'));
+          
+          // 添加当前选中状态
+          this.classList.add('selected');
+          
+          // 更新选中的角色
+          selectedRole = this.querySelector('p:first-child').textContent;
+        });
+      });
+      
+      // 登录表单提交
+      const loginForm = document.getElementById('loginForm');
+      loginForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const username = document.getElementById('username').value;
+        
+        // 简单验证
+        if (!username) {
+          alert('请输入你的芳名');
+          return;
+        }
+        
+        // 保存用户数据到本地存储
+        const userData = {
+          username: username,
+          role: selectedRole,
+          level: 1,
+          exp: 0,
+          attributes: {
+            beauty: selectedRole === '秀女' ? 70 : 60,
+            wisdom: selectedRole === '秀女' ? 60 : 50,
+            trickery: selectedRole === '秀女' ? 50 : 40,
+            constitution: selectedRole === '秀女' ? 65 : 75
+          },
+          position: selectedRole === '秀女' ? '秀女' : '宫女',
+          positionLevel: 1,
+          money: 1000,
+          items: [],
+          relationships: {
+            'emperor': 20,
+            'queen': 10,
+            'concubine1': -5
+          },
+          completedTasks: [],
+          currentTasks: ['task1'],
+          lastLogin: new Date().toISOString()
+        };
+        
+        // 保存任务数据
+        const tasks = [
+          {
+            id: 'task1',
+            title: '初入宫闱',
+            type: 'main',
+            description: '前往储秀宫报道，认识管事嬷嬷',
+            requirements: { location: '储秀宫' },
+            rewards: { exp: 100, money: 200 },
+            status: 'available'
+          },
+          {
+            id: 'task2',
+            title: '研习女红',
+            type: 'daily',
+            description: '在自己的寝宫中练习女红1小时',
+            requirements: { location: 'own_room', time: 60 },
+            rewards: { exp: 50, attribute: { beauty: 2 } },
+            status: 'available'
+          }
+        ];
+        
+        localStorage.setItem('userData', JSON.stringify(userData));
+        localStorage.setItem('tasks', JSON.stringify(tasks));
+        
+        // 跳转到主界面
+        window.location.href = 'main.html';
+      });
+    });
+  </script>
+</body>
+</html>

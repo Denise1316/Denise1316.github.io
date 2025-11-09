@@ -1,0 +1,1835 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>后宫宫斗 - 主界面</title>
+  <!-- Tailwind CSS v3 -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome -->
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#C41E3A', // 宫墙红
+            secondary: '#D4AF37', // 皇家金
+            tertiary: '#1D3557', // 深蓝
+            accent: '#6A0572', // 紫色
+            light: '#F8F9FA', // 米白
+            dark: '#343A40', // 深灰
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            serif: ['"Noto Serif SC"', 'serif'],
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .text-shadow {
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      }
+      .text-shadow-lg {
+        text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
+      }
+      .border-gold {
+        border-image: linear-gradient(to right, #D4AF37, #FFD700, #D4AF37) 1;
+      }
+      .scroll-reveal {
+        animation: scrollReveal 1s ease-out forwards;
+      }
+      .float {
+        animation: float 3s ease-in-out infinite;
+      }
+      .pulse-slow {
+        animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      }
+      .hover-scale {
+        transition: transform 0.3s ease;
+      }
+      .hover-scale:hover {
+        transform: scale(1.05);
+      }
+      .hover-glow:hover {
+        box-shadow: 0 0 15px rgba(212, 175, 55, 0.7);
+      }
+    }
+    
+    @keyframes scrollReveal {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+    
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.7;
+      }
+    }
+    
+    body {
+      font-family: 'Noto Serif SC', serif;
+      overflow-x: hidden;
+    }
+    
+    .main-container {
+      background-image: url('images/宫殿走廊.webp');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+    }
+    
+    .status-panel {
+      background-color: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+    transition: all 0.3s ease;
+      overflow: hidden;
+    }
+    
+    .status-panel.collapsed {
+      height: 70px;
+    }
+    
+    .status-panel.expanded {
+      height: auto;
+    }
+    
+    .status-header {
+      cursor: pointer;}
+    
+    .nav-panel {
+      background-color: rgba(29, 53, 87, 0.8);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.3);
+    }
+    
+    .nav-item {
+      transition: all 0.3s ease;
+      cursor: pointer;
+      position: relative;
+    }
+    
+    .nav-item::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 2px;
+      background-color: #D4AF37;
+      transition: all 0.3s ease;
+    }
+    
+    .nav-item:hover::after {
+      width: 80%;
+    }
+    
+    .nav-item.active::after {
+      width: 80%;
+    }
+    
+    .location-card {
+      background-color: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .location-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 25px rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(212, 175, 55, 0.5);
+    }
+    
+    .location-card img {
+      transition: all 0.5s ease;
+    }
+    
+    .location-card:hover img {
+      transform: scale(1.1);
+    }
+    
+    .event-notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background-color: rgba(196, 30, 58, 0.9);
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+      transform: translateX(120%);
+      transition: transform 0.5s ease-out;
+      z-index: 1000;
+    }
+    
+    .event-notification.show {
+      transform: translateX(0);
+    }
+    
+    .attribute-bar {
+      height: 8px;
+      background-color: rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    
+    .attribute-value {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 1s ease-out;
+    }
+    
+    .attribute-beauty {
+      background: linear-gradient(90deg, #FF6B6B, #FF8E8E);
+    }
+    
+    .attribute-wisdom {
+      background: linear-gradient(90deg, #4ECDC4, #6BD4CD);
+    }
+    
+    .attribute-trickery {
+      background: linear-gradient(90deg, #9333EA, #A855F7);
+    }
+    
+    .attribute-constitution {
+      background: linear-gradient(90deg, #10B981, #34D399);
+    }
+    
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(5px);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .modal.show {
+      display: flex;
+      opacity: 1;
+    }
+    
+    .modal-content {
+      background-color: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+      transform: scale(0.9);
+      transition: transform 0.3s ease;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    
+    .modal.show .modal-content {
+      transform: scale(1);
+    }
+    
+    .modal-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .modal-close:hover {
+      color: #D4AF37;
+      transform: rotate(90deg);
+    }
+    
+    .task-item {
+      background-color: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.3s ease;
+    }
+    
+    .task-item:hover {
+      border: 1px solid rgba(212, 175, 55, 0.5);
+      transform: translateX(5px);
+    }
+    
+    .task-item.main {
+      border-left: 4px solid #C41E3A;
+    }
+    
+    .task-item.branch {
+      border-left: 4px solid #457B9D;
+    }
+    
+    .task-item.daily {
+      border-left: 4px solid #06D6A0;
+    }
+    
+    .button {
+      background: linear-gradient(135deg, #D4AF37, #FFD700);
+      color: #1D3557;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: all 0.6s ease;
+    }
+    
+    .button:hover::before {
+      left: 100%;
+    }
+    
+    .button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    .button:active {
+      transform: translateY(-1px);
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+    }
+    
+    .button-secondary {
+      background: linear-gradient(135deg, #457B9D, #1D3557);
+      color: white;
+    }
+    
+    .button-danger {
+      background: linear-gradient(135deg, #C41E3A, #E63946);
+      color: white;
+    }
+    
+    .relationship-item {
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .relationship-item:last-child {
+      border-bottom: none;
+    }
+    
+    .relationship-avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      margin-right: 15px;
+      object-fit: cover;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .relationship-info {
+      flex-grow: 1;
+    }
+    
+    .relationship-name {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    
+    .relationship-level {
+      height: 6px;
+      background-color: rgba(255, 255, 255, 0.2);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    
+    .relationship-value {
+      height: 100%;
+      border-radius: 3px;
+    }
+    
+    .relationship-friendly {
+      background: linear-gradient(90deg, #10B981, #34D399);
+    }
+    
+    .relationship-neutral {
+      background: linear-gradient(90deg, #FBBF24, #F59E0B);
+    }
+    
+    .relationship-hostile {
+      background: linear-gradient(90deg, #EF4444, #DC2626);
+    }
+    
+    .item-card {
+      background-color: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .item-card:hover {
+      border: 1px solid rgba(212, 175, 55, 0.5);
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    .item-icon {
+      width: 60px;
+      height: 60px;
+      margin: 0 auto 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      font-size: 24px;
+    }
+    
+    .item-name {
+      font-weight: bold;
+      margin-bottom: 5px;
+      text-align: center;
+    }
+    
+    .item-effect {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.8);
+      text-align: center;
+    }
+    
+    .position-badge {
+      background: linear-gradient(135deg, #D4AF37, #FFD700);
+      color: #1D3557;
+      font-weight: bold;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      display: inline-block;
+    }
+    
+    .position-badge.common {
+      background: linear-gradient(135deg, #9CA3AF, #6B7280);
+      color: white;
+    }
+    
+    .position-badge.rare {
+      background: linear-gradient(135deg, #60A5FA, #3B82F6);
+      color: white;
+    }
+    
+    .position-badge.epic {
+      background: linear-gradient(135deg, #A78BFA, #8B5CF6);
+      color: white;
+    }
+    
+    .position-badge.legendary {
+      background: linear-gradient(135deg, #F59E0B, #D97706);
+      color: white;
+    }
+    
+    .position-tree {
+      position: relative;
+      padding: 20px;
+    }
+    
+    .position-node {
+      position: relative;
+      margin-bottom: 30px;
+    }
+    
+    .position-node::after {
+      content: '';
+      position: absolute;
+      bottom: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 2px;
+      height: 15px;
+      background-color: rgba(255, 255, 255, 0.3);
+    }
+    
+    .position-node:last-child::after {
+      display: none;
+    }
+    
+    .position-node-content {
+      background-color: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      padding: 15px;
+      transition: all 0.3s ease;
+    }
+    
+    .position-node-content.current {
+      border: 2px solid #D4AF37;
+      box-shadow: 0 0 15px rgba(212, 175, 55, 0.7);
+    }
+    
+    .position-node-content.locked {
+      opacity: 0.5;
+      filter: grayscale(50%);
+    }
+    
+    .position-requirements {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.7);
+      margin-top: 10px;
+    }
+    
+    .position-requirements span {
+      display: inline-block;
+      margin-right: 10px;
+      margin-bottom: 5px;
+      padding: 2px 5px;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+    }
+    
+    .position-requirements span.met {
+      color: #10B981;
+    }
+    
+    .position-requirements span.unmet {
+      color: #EF4444;
+    }
+    
+    .dialog-container {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90%;
+      max-width: 600px;
+      background-color: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+      border-radius: 10px;
+      padding: 20px;
+      z-index: 900;
+      opacity: 0;
+      transition: all 0.3s ease;
+      pointer-events: none;
+    }
+    
+    .dialog-container.show {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(-50%) translateY(-20px);
+    }
+    
+    .dialog-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      margin-right: 15px;
+    }
+    
+    .dialog-name {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    
+    .dialog-text {
+      margin-bottom: 15px;
+      line-height: 1.5;
+    }
+    
+    .dialog-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    
+    .dialog-option {
+      background-color: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      padding: 5px 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 14px;
+    }
+    
+    .dialog-option:hover {
+      background-color: rgba(212, 175, 55, 0.2);
+      border: 1px solid #D4AF37;
+    }
+  </style>
+</head>
+<body class="main-container min-h-screen text-white">
+  <!-- 状态面板 -->
+  <div class="status-panel collapsed absolute top-4 left-4 w-64 rounded-xl p-4 z-10">
+    <div class="status-header flex items-center mb-4">
+      <div class="w-16 h-16 rounded-full bg-secondary/30 flex items-center justify-center text-2xl font-bold border-2 border-secondary">
+        <span id="userInitials">秀</span>
+      </div>
+      <div class="ml-3">
+        <h3 class="text-lg font-bold" id="userName">未命名</h3>
+        <span class="position-badge" id="userPosition">秀女</span>
+      </div>
+    </div>
+    
+    <div class="status-details space-y-3 hidden">
+      <div>
+        <div class="flex justify-between text-sm mb-1">
+          <span>等级</span>
+          <span id="userLevel">1</span>
+        </div>
+        <div class="attribute-bar">
+          <div class="attribute-value attribute-beauty" id="expBar" style="width: 0%"></div>
+        </div>
+        <div class="flex justify-between text-xs text-white/70">
+          <span id="currentExp">0</span>
+          <span id="nextLevelExp">100</span>
+        </div>
+      </div>
+      
+      <div class="grid grid-cols-2 gap-2 text-sm">
+        <div>
+          <div class="flex justify-between mb-1">
+            <span>容貌</span>
+            <span id="userBeauty">70</span>
+          </div>
+          <div class="attribute-bar">
+            <div class="attribute-value attribute-beauty" id="beautyBar" style="width: 70%"></div>
+          </div>
+        </div>
+        
+        <div>
+          <div class="flex justify-between mb-1">
+            <span>智慧</span>
+            <span id="userWisdom">60</span>
+          </div>
+          <div class="attribute-bar">
+            <div class="attribute-value attribute-wisdom" id="wisdomBar" style="width: 60%"></div>
+          </div>
+        </div>
+        
+        <div>
+          <div class="flex justify-between mb-1">
+            <span>心机</span>
+            <span id="userTrickery">50</span>
+          </div>
+          <div class="attribute-bar">
+            <div class="attribute-value attribute-trickery" id="trickeryBar" style="width: 50%"></div>
+          </div>
+        </div>
+        
+        <div>
+          <div class="flex justify-between mb-1">
+            <span>体质</span>
+            <span id="userConstitution">65</span>
+          </div>
+          <div class="attribute-bar">
+            <div class="attribute-value attribute-constitution" id="constitutionBar" style="width: 65%"></div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="flex justify-between text-sm mt-2">
+        <div>
+          <i class="fa fa-money text-secondary mr-1"></i>
+          <span id="userMoney">1000</span>
+        </div>
+        <div>
+          <i class="fa fa-heart text-primary mr-1"></i>
+          <span id="userFavor">20</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 事件通知 -->
+  <div class="event-notification rounded-lg p-4 max-w-xs" id="eventNotification">
+    <div class="flex items-start">
+      <div class="text-secondary text-xl mr-3">
+        <i class="fa fa-bell"></i>
+      </div>
+      <div>
+        <h4 class="font-bold" id="eventTitle">事件通知</h4>
+        <p class="text-sm mt-1" id="eventMessage">这是一个事件通知</p>
+        <div class="mt-2 text-xs text-white/70" id="eventTime">刚刚</div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 主要内容区域 -->
+  <div class="container mx-auto px-4 pt-24 pb-24 min-h-screen">
+    <!-- 场景选择 -->
+    <div class="mb-8">
+      <h2 class="text-2xl font-bold mb-4 text-shadow">宫廷场景</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="location-card rounded-xl overflow-hidden" data-location="palace">
+          <div class="h-40 overflow-hidden">
+            <img src="images/皇帝政务厅.jpg" alt="宫殿" class="w-full h-full object-cover">
+          </div>
+          <div class="p-4 bg-tertiary/80">
+            <h3 class="text-xl font-bold">宫殿</h3>
+            <p class="text-sm text-white/70 mt-1">皇帝处理政务的地方，也是宫廷权力的中心</p>
+            <div class="mt-3 flex justify-between items-center">
+              <span class="text-xs bg-primary/20 text-primary px-2 py-1 rounded-full">权力中心</span>
+              <button class="text-xs bg-secondary/20 text-secondary px-3 py-1 rounded-full hover-scale">前往</button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="location-card rounded-xl overflow-hidden" data-location="bedroom">
+          <div class="h-40 overflow-hidden">
+            <img src="images/寝宫.jpg" alt="寝宫" class="w-full h-full object-cover">
+          </div>
+          <div class="p-4 bg-tertiary/80">
+            <h3 class="text-xl font-bold">寝宫</h3>
+            <p class="text-sm text-white/70 mt-1">你的私人空间，可以在这里休息和培养技能</p>
+            <div class="mt-3 flex justify-between items-center">
+              <span class="text-xs bg-secondary/20 text-secondary px-2 py-1 rounded-full">私人空间</span>
+              <button class="text-xs bg-secondary/20 text-secondary px-3 py-1 rounded-full hover-scale">前往</button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="location-card rounded-xl overflow-hidden" data-location="garden">
+          <div class="h-40 overflow-hidden">
+            <img src="images/御花园.jpg" alt="御花园" class="w-full h-full object-cover">
+          </div>
+          <div class="p-4 bg-tertiary/80">
+            <h3 class="text-xl font-bold">御花园</h3>
+            <p class="text-sm text-white/70 mt-1">宫廷中的花园，是妃嫔们休闲和社交的场所</p>
+            <div class="mt-3 flex justify-between items-center">
+              <span class="text-xs bg-accent/20 text-accent px-2 py-1 rounded-full">社交场所</span>
+              <button class="text-xs bg-secondary/20 text-secondary px-3 py-1 rounded-full hover-scale">前往</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 今日任务 -->
+    <div>
+      <h2 class="text-2xl font-bold mb-4 text-shadow">今日任务</h2>
+      <div class="space-y-4">
+        <div class="task-item main rounded-lg p-4" data-task-id="task1">
+          <div class="flex justify-between items-start">
+            <div>
+              <h3 class="font-bold">初入宫闱</h3>
+              <p class="text-sm text-white/70 mt-1">前往储秀宫报道，认识管事嬷嬷</p>
+              <div class="mt-2 flex items-center text-xs">
+                <span class="bg-primary/20 text-primary px-2 py-1 rounded-full mr-2">主线任务</span>
+                <span class="text-white/50">奖励: 100经验, 200银两</span>
+              </div>
+            </div>
+            <button class="button text-sm py-1 px-4 rounded-lg">开始</button>
+          </div>
+        </div>
+        
+        <div class="task-item daily rounded-lg p-4" data-task-id="task2">
+          <div class="flex justify-between items-start">
+            <div>
+              <h3 class="font-bold">研习女红</h3>
+              <p class="text-sm text-white/70 mt-1">在自己的寝宫中练习女红1小时</p>
+              <div class="mt-2 flex items-center text-xs">
+                <span class="bg-green-500/20 text-green-500 px-2 py-1 rounded-full mr-2">日常任务</span>
+                <span class="text-white/50">奖励: 50经验, 容貌+2</span>
+              </div>
+            </div>
+            <button class="button text-sm py-1 px-4 rounded-lg">开始</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 底部导航栏 -->
+  <div class="nav-panel fixed bottom-0 left-0 right-0 p-4 z-20">
+    <div class="container mx-auto flex justify-around">
+      <div class="nav-item active flex flex-col items-center" data-target="home">
+        <i class="fa fa-home text-xl"></i>
+        <span class="text-xs mt-1">主页</span>
+      </div>
+      
+      <div class="nav-item flex flex-col items-center" data-target="role">
+        <i class="fa fa-user text-xl"></i>
+        <span class="text-xs mt-1">角色</span>
+      </div>
+      
+      <div class="nav-item flex flex-col items-center" data-target="tasks">
+        <i class="fa fa-list-alt text-xl"></i>
+        <span class="text-xs mt-1">任务</span>
+      </div>
+      
+      <div class="nav-item flex flex-col items-center" data-target="social">
+        <i class="fa fa-users text-xl"></i>
+        <span class="text-xs mt-1">社交</span>
+      </div>
+      
+      <div class="nav-item flex flex-col items-center" data-target="bag">
+        <i class="fa fa-diamond text-xl"></i>
+        <span class="text-xs mt-1">背包</span>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 角色模态框 -->
+  <div class="modal" id="roleModal">
+    <div class="modal-content rounded-xl p-6 w-full max-w-md relative">
+      <div class="modal-close text-2xl">
+        <i class="fa fa-times"></i>
+      </div>
+      
+      <h2 class="text-2xl font-bold mb-6 text-center">角色信息</h2>
+      
+      <div class="flex justify-center mb-6">
+        <div class="w-24 h-24 rounded-full bg-secondary/30 flex items-center justify-center text-4xl font-bold border-2 border-secondary">
+          <span id="modalUserInitials">秀</span>
+        </div>
+      </div>
+      
+      <div class="text-center mb-6">
+        <h3 class="text-xl font-bold" id="modalUserName">未命名</h3>
+        <span class="position-badge mt-2" id="modalUserPosition">秀女</span>
+      </div>
+      
+      <div class="space-y-4">
+        <div>
+          <div class="flex justify-between text-sm mb-1">
+            <span>等级</span>
+            <span id="modalUserLevel">1</span>
+          </div>
+          <div class="attribute-bar">
+            <div class="attribute-value attribute-beauty" id="modalExpBar" style="width: 0%"></div>
+          </div>
+          <div class="flex justify-between text-xs text-white/70">
+            <span id="modalCurrentExp">0</span>
+            <span id="modalNextLevelExp">100</span>
+          </div>
+        </div>
+        
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <div class="flex justify-between mb-1">
+              <span>容貌</span>
+              <span id="modalUserBeauty">70</span>
+            </div>
+            <div class="attribute-bar">
+              <div class="attribute-value attribute-beauty" id="modalBeautyBar" style="width: 70%"></div>
+            </div>
+          </div>
+          
+          <div>
+            <div class="flex justify-between mb-1">
+              <span>智慧</span>
+              <span id="modalUserWisdom">60</span>
+            </div>
+            <div class="attribute-bar">
+              <div class="attribute-value attribute-wisdom" id="modalWisdomBar" style="width: 60%"></div>
+            </div>
+          </div>
+          
+          <div>
+            <div class="flex justify-between mb-1">
+              <span>心机</span>
+              <span id="modalUserTrickery">50</span>
+            </div>
+            <div class="attribute-bar">
+              <div class="attribute-value attribute-trickery" id="modalTrickeryBar" style="width: 50%"></div>
+            </div>
+          </div>
+          
+          <div>
+            <div class="flex justify-between mb-1">
+              <span>体质</span>
+              <span id="modalUserConstitution">65</span>
+            </div>
+            <div class="attribute-bar">
+              <div class="attribute-value attribute-constitution" id="modalConstitutionBar" style="width: 65%"></div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="flex justify-between text-sm mt-2">
+          <div>
+            <i class="fa fa-money text-secondary mr-1"></i>
+            <span id="modalUserMoney">1000</span>
+          </div>
+          <div>
+            <i class="fa fa-heart text-primary mr-1"></i>
+            <span id="modalUserFavor">20</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="mt-8">
+        <h3 class="text-lg font-bold mb-4">位分晋升</h3>
+        <div class="position-tree">
+          <div class="position-node">
+            <div class="position-node-content current">
+              <div class="flex justify-between items-center">
+                <h4 class="font-bold">秀女</h4>
+                <span class="position-badge common">普通</span>
+              </div>
+              <p class="text-sm text-white/70 mt-1">刚入宫的女子，等待皇帝的宠幸</p>
+            </div>
+          </div>
+          
+          <div class="position-node">
+            <div class="position-node-content locked">
+              <div class="flex justify-between items-center">
+                <h4 class="font-bold">答应</h4>
+                <span class="position-badge common">普通</span>
+              </div>
+              <p class="text-sm text-white/70 mt-1">获得皇帝初步认可的低位分妃嫔</p>
+              <div class="position-requirements">
+                <span class="unmet">皇帝好感度: 50</span>
+                <span class="unmet">智慧: 70</span>
+                <span class="unmet">经验: 500</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="position-node">
+            <div class="position-node-content locked">
+              <div class="flex justify-between items-center">
+                <h4 class="font-bold">常在</h4>
+                <span class="position-badge rare">稀有</span>
+              </div>
+              <p class="text-sm text-white/70 mt-1">有一定地位的妃嫔，可获得更多赏赐</p>
+              <div class="position-requirements">
+                <span class="unmet">皇帝好感度: 100</span>
+                <span class="unmet">容貌: 80</span>
+                <span class="unmet">智慧: 80</span>
+                <span class="unmet">经验: 1000</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 任务模态框 -->
+  <div class="modal" id="tasksModal">
+    <div class="modal-content rounded-xl p-6 w-full max-w-md relative">
+      <div class="modal-close text-2xl">
+        <i class="fa fa-times"></i>
+      </div>
+      
+      <h2 class="text-2xl font-bold mb-6 text-center">任务系统</h2>
+      
+      <div class="mb-6">
+        <div class="flex border-b border-white/20">
+          <button class="task-tab py-2 px-4 border-b-2 border-secondary text-secondary" data-tab="all">全部</button>
+          <button class="task-tab py-2 px-4 border-b-2 border-transparent" data-tab="main">主线</button>
+          <button class="task-tab py-2 px-4 border-b-2 border-transparent" data-tab="daily">日常</button>
+        </div>
+      </div>
+      
+      <div class="task-content" id="allTasks">
+        <div class="space-y-4">
+          <div class="task-item main rounded-lg p-4" data-task-id="task1">
+            <div class="flex justify-between items-start">
+              <div>
+                <h3 class="font-bold">初入宫闱</h3>
+                <p class="text-sm text-white/70 mt-1">前往储秀宫报道，认识管事嬷嬷</p>
+                <div class="mt-2 flex items-center text-xs">
+                  <span class="bg-primary/20 text-primary px-2 py-1 rounded-full mr-2">主线任务</span>
+                  <span class="text-white/50">奖励: 100经验, 200银两</span>
+                </div>
+              </div>
+              <button class="button text-sm py-1 px-4 rounded-lg">开始</button>
+            </div>
+          </div>
+          
+          <div class="task-item daily rounded-lg p-4" data-task-id="task2">
+            <div class="flex justify-between items-start">
+              <div>
+                <h3 class="font-bold">研习女红</h3>
+                <p class="text-sm text-white/70 mt-1">在自己的寝宫中练习女红1小时</p>
+                <div class="mt-2 flex items-center text-xs">
+                  <span class="bg-green-500/20 text-green-500 px-2 py-1 rounded-full mr-2">日常任务</span>
+                  <span class="text-white/50">奖励: 50经验, 容貌+2</span>
+                </div>
+              </div>
+              <button class="button text-sm py-1 px-4 rounded-lg">开始</button>
+            </div>
+          </div>
+          
+          <div class="task-item branch rounded-lg p-4 opacity-50" data-task-id="task3">
+            <div class="flex justify-between items-start">
+              <div>
+                <h3 class="font-bold">寻找密友</h3>
+                <p class="text-sm text-white/70 mt-1">与其他秀女建立友好关系</p>
+                <div class="mt-2 flex items-center text-xs">
+                  <span class="bg-blue-500/20 text-blue-500 px-2 py-1 rounded-full mr-2">支线任务</span>
+                  <span class="text-white/50">奖励: 80经验, 心机+3</span>
+                </div>
+              </div>
+              <button class="button-secondary text-sm py-1 px-4 rounded-lg" disabled>未解锁</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="task-content hidden" id="mainTasks">
+        <div class="space-y-4">
+          <div class="task-item main rounded-lg p-4" data-task-id="task1">
+            <div class="flex justify-between items-start">
+              <div>
+                <h3 class="font-bold">初入宫闱</h3>
+                <p class="text-sm text-white/70 mt-1">前往储秀宫报道，认识管事嬷嬷</p>
+                <div class="mt-2 flex items-center text-xs">
+                  <span class="bg-primary/20 text-primary px-2 py-1 rounded-full mr-2">主线任务</span>
+                  <span class="text-white/50">奖励: 100经验, 200银两</span>
+                </div>
+              </div>
+              <button class="button text-sm py-1 px-4 rounded-lg">开始</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="task-content hidden" id="dailyTasks">
+        <div class="space-y-4">
+          <div class="task-item daily rounded-lg p-4" data-task-id="task2">
+            <div class="flex justify-between items-start">
+              <div>
+                <h3 class="font-bold">研习女红</h3>
+                <p class="text-sm text-white/70 mt-1">在自己的寝宫中练习女红1小时</p>
+                <div class="mt-2 flex items-center text-xs">
+                  <span class="bg-green-500/20 text-green-500 px-2 py-1 rounded-full mr-2">日常任务</span>
+                  <span class="text-white/50">奖励: 50经验, 容貌+2</span>
+                </div>
+              </div>
+              <button class="button text-sm py-1 px-4 rounded-lg">开始</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 社交模态框 -->
+  <div class="modal" id="socialModal">
+    <div class="modal-content rounded-xl p-6 w-full max-w-md relative">
+      <div class="modal-close text-2xl">
+        <i class="fa fa-times"></i>
+      </div>
+      
+      <h2 class="text-2xl font-bold mb-6 text-center">社交关系</h2>
+      
+      <div class="space-y-4">
+        <div class="relationship-item">
+          <img src="images/皇上.webp" alt="皇帝" class="relationship-avatar">
+          <div class="relationship-info">
+            <div class="relationship-name">皇帝</div>
+            <div class="flex items-center text-xs text-white/70 mb-1">
+              <span>好感度: 20</span>
+              <span class="ml-2 text-yellow-500">中立</span>
+            </div>
+            <div class="relationship-level">
+              <div class="relationship-value relationship-neutral" style="width: 20%"></div>
+            </div>
+          </div>
+          <button class="button text-xs py-1 px-3 rounded-lg ml-2">互动</button>
+        </div>
+        
+        <div class="relationship-item">
+          <img src="images/皇后.webp" alt="皇后" class="relationship-avatar">
+          <div class="relationship-info">
+            <div class="relationship-name">皇后</div>
+            <div class="flex items-center text-xs text-white/70 mb-1">
+              <span>好感度: 10</span>
+              <span class="ml-2 text-yellow-500">中立</span>
+            </div>
+            <div class="relationship-level">
+              <div class="relationship-value relationship-neutral" style="width: 10%"></div>
+            </div>
+          </div>
+          <button class="button text-xs py-1 px-3 rounded-lg ml-2">互动</button>
+        </div>
+        
+        <div class="relationship-item">
+          <img src="images/华妃.webp" alt="华妃" class="relationship-avatar">
+          <div class="relationship-info">
+            <div class="relationship-name">华妃</div>
+            <div class="flex items-center text-xs text-white/70 mb-1">
+              <span>好感度: -5</span>
+              <span class="ml-2 text-red-500">敌对</span>
+            </div>
+            <div class="relationship-level">
+              <div class="relationship-value relationship-hostile" style="width: 5%"></div>
+            </div>
+          </div>
+          <button class="button text-xs py-1 px-3 rounded-lg ml-2">互动</button>
+        </div>
+        
+        <div class="relationship-item">
+          <img src="images/沈眉庄.png" alt="沈眉庄" class="relationship-avatar">
+          <div class="relationship-info">
+            <div class="relationship-name">沈眉庄</div>
+            <div class="flex items-center text-xs text-white/70 mb-1">
+              <span>好感度: 30</span>
+              <span class="ml-2 text-green-500">友好</span>
+            </div>
+            <div class="relationship-level">
+              <div class="relationship-value relationship-friendly" style="width: 30%"></div>
+            </div>
+          </div>
+          <button class="button text-xs py-1 px-3 rounded-lg ml-2">互动</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 背包模态框 -->
+  <div class="modal" id="bagModal">
+    <div class="modal-content rounded-xl p-6 w-full max-w-md relative">
+      <div class="modal-close text-2xl">
+        <i class="fa fa-times"></i>
+      </div>
+      
+      <h2 class="text-2xl font-bold mb-6 text-center">背包</h2>
+      
+      <div class="mb-6">
+        <div class="flex justify-between items-center">
+          <div>
+            <i class="fa fa-money text-secondary mr-1"></i>
+            <span id="bagUserMoney">1000</span> 银两
+          </div>
+          <div>
+            <span id="bagItemCount">0</span> / 20 物品
+          </div>
+        </div>
+      </div>
+      
+      <div class="mb-6">
+        <div class="flex border-b border-white/20">
+          <button class="item-tab py-2 px-4 border-b-2 border-secondary text-secondary" data-tab="all">全部</button>
+          <button class="item-tab py-2 px-4 border-b-2 border-transparent" data-tab="consumable">消耗品</button>
+          <button class="item-tab py-2 px-4 border-b-2 border-transparent" data-tab="equipment">装备</button>
+        </div>
+      </div>
+      
+      <div class="item-content" id="allItems">
+        <div class="grid grid-cols-3 gap-4">
+          <div class="item-card rounded-lg p-3">
+            <div class="item-icon text-primary">
+              <i class="fa fa-heart"></i>
+            </div>
+            <div class="item-name">胭脂</div>
+            <div class="item-effect">容貌+5</div>
+          </div>
+          
+          <div class="item-card rounded-lg p-3">
+            <div class="item-icon text-blue-500">
+              <i class="fa fa-book"></i>
+            </div>
+            <div class="item-name">诗集</div>
+            <div class="item-effect">智慧+3</div>
+          </div>
+          
+          <div class="item-card rounded-lg p-3">
+            <div class="item-icon text-green-500">
+              <i class="fa fa-leaf"></i>
+            </div>
+            <div class="item-name">草药</div>
+            <div class="item-effect">体质+2</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="item-content hidden" id="consumableItems">
+        <div class="grid grid-cols-3 gap-4">
+          <div class="item-card rounded-lg p-3">
+            <div class="item-icon text-primary">
+              <i class="fa fa-heart"></i>
+            </div>
+            <div class="item-name">胭脂</div>
+            <div class="item-effect">容貌+5</div>
+          </div>
+          
+          <div class="item-card rounded-lg p-3">
+            <div class="item-icon text-blue-500">
+              <i class="fa fa-book"></i>
+            </div>
+            <div class="item-name">诗集</div>
+            <div class="item-effect">智慧+3</div>
+          </div>
+          
+          <div class="item-card rounded-lg p-3">
+            <div class="item-icon text-green-500">
+              <i class="fa fa-leaf"></i>
+            </div>
+            <div class="item-name">草药</div>
+            <div class="item-effect">体质+2</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="item-content hidden" id="equipmentItems">
+        <div class="text-center py-8 text-white/50">
+          <i class="fa fa-empty-set text-4xl mb-3"></i>
+          <p>暂无装备</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 对话弹窗 -->
+  <div class="dialog-container" id="dialogContainer">
+    <div class="flex">
+      <img src="images/管教嬷嬷.webp" alt="管教嬷嬷" class="dialog-avatar">
+      <div class="flex-grow">
+        <div class="dialog-name">管事嬷嬷</div>
+        <div class="dialog-text">新来的秀女，随我来。入宫之后，言行举止都要谨慎，不可失了规矩。</div>
+        <div class="dialog-options">
+          <div class="dialog-option">是，嬷嬷。</div>
+          <div class="dialog-option">请嬷嬷指教。</div>
+          <div class="dialog-option">多谢嬷嬷提醒。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 页面加载完成后执行
+    document.addEventListener('DOMContentLoaded', function() {
+      // 从本地存储获取用户数据
+      const userData = JSON.parse(localStorage.getItem('userData')) || {
+        username: '未命名',
+        role: '秀女',
+        level: 1,
+        exp: 0,
+        attributes: {
+          beauty: 70,
+          wisdom: 60,
+          trickery: 50,
+          constitution: 65
+        },
+        position: '秀女',
+        positionLevel: 1,
+        money: 1000,
+        items: [],
+        relationships: {
+          'emperor': 20,
+          'queen': 10,
+          'concubine1': -5
+        },
+        completedTasks: [],
+        currentTasks: ['task1'],
+        lastLogin: new Date().toISOString()
+      };
+      
+      // 更新UI显示
+      updateUserInterface(userData);
+      
+      // 状态栏交互
+      const statusPanel = document.querySelector('.status-panel');
+      const statusHeader = document.querySelector('.status-header');
+      const statusDetails = document.querySelector('.status-details');
+      
+      statusHeader.addEventListener('mouseenter', function() {
+        statusPanel.classList.remove('collapsed');
+        statusPanel.classList.add('expanded');
+        statusDetails.classList.remove('hidden');
+      });
+      
+      statusPanel.addEventListener('mouseleave', function() {
+        statusPanel.classList.remove('expanded');
+        statusPanel.classList.add('collapsed');
+        statusDetails.classList.add('hidden');
+      });
+
+      // 导航切换
+      const navItems = document.querySelectorAll('.nav-item');
+      navItems.forEach(item => {
+        item.addEventListener('click', function() {
+          // 移除所有导航项的active类
+          navItems.forEach(navItem => navItem.classList.remove('active'));
+          
+          // 添加当前导航项的active类
+          this.classList.add('active');
+          
+          // 获取目标内容
+          const target = this.getAttribute('data-target');
+          
+          // 显示对应模态框
+          if (target === 'home') {
+            // 关闭所有模态框
+            closeAllModals();
+          } else if (target === 'role') {
+            document.getElementById('roleModal').classList.add('show');
+          } else if (target === 'tasks') {
+            document.getElementById('tasksModal').classList.add('show');
+          } else if (target === 'social') {
+            document.getElementById('socialModal').classList.add('show');
+          } else if (target === 'bag') {
+            document.getElementById('bagModal').classList.add('show');
+          }
+        });
+      });
+      
+      // 关闭模态框
+      const modalCloseButtons = document.querySelectorAll('.modal-close');
+      modalCloseButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          const modal = this.closest('.modal');
+          modal.classList.remove('show');
+          
+          // 重置导航到主页
+          navItems.forEach(navItem => navItem.classList.remove('active'));
+          document.querySelector('[data-target="home"]').classList.add('active');
+        });
+      });
+      
+      // 任务标签切换
+      const taskTabs = document.querySelectorAll('.task-tab');
+      taskTabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+          // 移除所有标签的active类
+          taskTabs.forEach(taskTab => {
+            taskTab.classList.remove('border-secondary', 'text-secondary');
+            taskTab.classList.add('border-transparent');
+          });
+          
+          // 添加当前标签的active类
+          this.classList.remove('border-transparent');
+          this.classList.add('border-secondary', 'text-secondary');
+          
+          // 获取目标内容
+          const target = this.getAttribute('data-tab');
+          
+          // 显示对应内容
+          document.querySelectorAll('.task-content').forEach(content => {
+            content.classList.add('hidden');
+          });
+          document.getElementById(`${target}Tasks`).classList.remove('hidden');
+        });
+      });
+      
+      // 物品标签切换
+      const itemTabs = document.querySelectorAll('.item-tab');
+      itemTabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+          // 移除所有标签的active类
+          itemTabs.forEach(itemTab => {
+            itemTab.classList.remove('border-secondary', 'text-secondary');
+            itemTab.classList.add('border-transparent');
+          });
+          
+          // 添加当前标签的active类
+          this.classList.remove('border-transparent');
+          this.classList.add('border-secondary', 'text-secondary');
+          
+          // 获取目标内容
+          const target = this.getAttribute('data-tab');
+          
+          // 显示对应内容
+          document.querySelectorAll('.item-content').forEach(content => {
+            content.classList.add('hidden');
+          });
+          document.getElementById(`${target}Items`).classList.remove('hidden');
+        });
+      });
+      
+      // 场景点击事件
+      const locationCards = document.querySelectorAll('.location-card');
+      locationCards.forEach(card => {
+        card.addEventListener('click', function() {
+          const location = this.getAttribute('data-location');
+          
+          // 显示事件通知
+          showEventNotification('场景切换', `你前往了${this.querySelector('h3').textContent}`);
+          
+          // 如果是宫殿，显示皇帝对话
+          if (location === 'palace') {
+            showDialog('emperor', '皇帝', '新来的秀女？抬起头来让朕看看。', [
+              '臣妾参见皇上。',
+              '皇上万岁万岁万万岁。',
+              '（紧张地低下头）'
+            ]);
+          }
+          // 如果是寝宫，显示休息选项
+          else if (location === 'bedroom') {
+            showDialog('maid', '侍女', '小主，您回来了。需要休息还是练习技能？', [
+              '我要休息。',
+              '我要练习女红。',
+              '我要阅读诗书。'
+            ]);
+          }
+          // 如果是御花园，显示其他妃嫔
+          else if (location === 'garden') {
+            showDialog('concubine', '华妃', '哟，这不是新来的秀女吗？怎么一个人在这里？', [
+              '参见华妃娘娘。',
+              '臣妾只是随意逛逛。',
+              '（无视她，转身离开）'
+            ]);
+          }
+        });
+      });
+      
+      // 任务点击事件
+      const taskItems = document.querySelectorAll('.task-item');
+      taskItems.forEach(item => {
+        const button = item.querySelector('button');
+        if (button && !button.disabled) {
+          button.addEventListener('click', function() {
+            const taskId = item.getAttribute('data-task-id');
+            
+            // 模拟任务完成
+            completeTask(userData, taskId);
+          });
+        }
+      });
+      
+      // 社交互动点击事件
+      const relationshipItems = document.querySelectorAll('.relationship-item');
+      relationshipItems.forEach(item => {
+        const button = item.querySelector('button');
+        button.addEventListener('click', function() {
+          const name = item.querySelector('.relationship-name').textContent;
+          
+          // 显示互动选项
+          if (name === '皇帝') {
+            showDialog('emperor', '皇帝', '何事？', [
+              '臣妾有事启奏。',
+              '臣妾为皇上准备了点心。',
+              '臣妾想陪皇上说说话。'
+            ]);
+          } else if (name === '皇后') {
+            showDialog('queen', '皇后', '你来见本宫有何事？', [
+              '臣妾参见皇后娘娘。',
+              '臣妾是来向娘娘请安的。',
+              '臣妾有事想请教娘娘。'
+            ]);
+          } else if (name === '华妃') {
+            showDialog('concubine', '华妃', '哦？找我有事？', [
+              '臣妾想和娘娘做朋友。',
+              '臣妾有礼物送给娘娘。',
+              '（沉默不语）'
+            ]);
+          } else if (name === '沈眉庄') {
+            showDialog('friend', '沈眉庄', '妹妹，你来了！', [
+              '姐姐！',
+              '姐姐最近还好吗？',
+              '我带了点心给姐姐。'
+            ]);
+          }
+        });
+      });
+      
+      // 物品点击事件
+      const itemCards = document.querySelectorAll('.item-card');
+      itemCards.forEach(card => {
+        card.addEventListener('click', function() {
+          const itemName = this.querySelector('.item-name').textContent;
+          const itemEffect = this.querySelector('.item-effect').textContent;
+          
+          // 显示使用确认
+          showDialog('item', '物品使用', `是否使用${itemName}？${itemEffect}`, [
+            '使用',
+            '取消'
+          ], (option) => {
+            if (option === '使用') {
+              // 应用物品效果
+              applyItemEffect(userData, itemName);
+              
+              // 显示事件通知
+              showEventNotification('物品使用', `你使用了${itemName}，${itemEffect}`);
+            }
+          });
+        });
+      });
+      
+      // 对话选项点击事件
+      document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('dialog-option')) {
+          const option = e.target.textContent;
+          const dialogContainer = document.getElementById('dialogContainer');
+          const npcType = dialogContainer.getAttribute('data-npc-type');
+          
+          // 处理对话选项
+          handleDialogOption(userData, npcType, option);
+          
+          // 关闭对话
+          dialogContainer.classList.remove('show');
+        }
+      });
+      
+      // 初始化显示事件通知
+      setTimeout(() => {
+        showEventNotification('欢迎入宫', '欢迎来到后宫，请小心行事，步步为营。');
+      }, 1000);
+    });
+    
+    // 更新用户界面
+    function updateUserInterface(userData) {
+      // 更新主界面
+      document.getElementById('userName').textContent = userData.username;
+      document.getElementById('userInitials').textContent = userData.username.charAt(0);
+      document.getElementById('userPosition').textContent = userData.position;
+      document.getElementById('userLevel').textContent = userData.level;
+      document.getElementById('userBeauty').textContent = userData.attributes.beauty;
+      document.getElementById('userWisdom').textContent = userData.attributes.wisdom;
+      document.getElementById('userTrickery').textContent = userData.attributes.trickery;
+      document.getElementById('userConstitution').textContent = userData.attributes.constitution;
+      document.getElementById('userMoney').textContent = userData.money;
+      document.getElementById('userFavor').textContent = userData.relationships.emperor;
+      
+      // 更新经验条
+      const expToNextLevel = userData.level * 100;
+      const expPercentage = (userData.exp / expToNextLevel) * 100;
+      document.getElementById('expBar').style.width = `${expPercentage}%`;
+      document.getElementById('currentExp').textContent = userData.exp;
+      document.getElementById('nextLevelExp').textContent = expToNextLevel;
+      
+      // 更新属性条
+      document.getElementById('beautyBar').style.width = `${userData.attributes.beauty}%`;
+      document.getElementById('wisdomBar').style.width = `${userData.attributes.wisdom}%`;
+      document.getElementById('trickeryBar').style.width = `${userData.attributes.trickery}%`;
+      document.getElementById('constitutionBar').style.width = `${userData.attributes.constitution}%`;
+      
+      // 更新角色模态框
+      document.getElementById('modalUserName').textContent = userData.username;
+      document.getElementById('modalUserInitials').textContent = userData.username.charAt(0);
+      document.getElementById('modalUserPosition').textContent = userData.position;
+      document.getElementById('modalUserLevel').textContent = userData.level;
+      document.getElementById('modalUserBeauty').textContent = userData.attributes.beauty;
+      document.getElementById('modalUserWisdom').textContent = userData.attributes.wisdom;
+      document.getElementById('modalUserTrickery').textContent = userData.attributes.trickery;
+      document.getElementById('modalUserConstitution').textContent = userData.attributes.constitution;
+      document.getElementById('modalUserMoney').textContent = userData.money;
+      document.getElementById('modalUserFavor').textContent = userData.relationships.emperor;
+      
+      // 更新角色模态框经验条
+      const modalExpToNextLevel = userData.level * 100;
+      const modalExpPercentage = (userData.exp / modalExpToNextLevel) * 100;
+      document.getElementById('modalExpBar').style.width = `${modalExpPercentage}%`;
+      document.getElementById('modalCurrentExp').textContent = userData.exp;
+      document.getElementById('modalNextLevelExp').textContent = modalExpToNextLevel;
+      
+      // 更新角色模态框属性条
+      document.getElementById('modalBeautyBar').style.width = `${userData.attributes.beauty}%`;
+      document.getElementById('modalWisdomBar').style.width = `${userData.attributes.wisdom}%`;
+      document.getElementById('modalTrickeryBar').style.width = `${userData.attributes.trickery}%`;
+      document.getElementById('modalConstitutionBar').style.width = `${userData.attributes.constitution}%`;
+      
+      // 更新背包模态框
+      document.getElementById('bagUserMoney').textContent = userData.money;
+      document.getElementById('bagItemCount').textContent = userData.items.length;
+      
+      // 保存用户数据
+      localStorage.setItem('userData', JSON.stringify(userData));
+    }
+    
+    // 显示事件通知
+    function showEventNotification(title, message) {
+      const notification = document.getElementById('eventNotification');
+      document.getElementById('eventTitle').textContent = title;
+      document.getElementById('eventMessage').textContent = message;
+      document.getElementById('eventTime').textContent = '刚刚';
+      
+      notification.classList.add('show');
+      
+      // 3秒后自动关闭
+      setTimeout(() => {
+        notification.classList.remove('show');
+      }, 3000);
+    }
+    
+    // 显示对话
+    function showDialog(npcType, name, text, options, callback) {
+      const dialogContainer = document.getElementById('dialogContainer');
+      dialogContainer.setAttribute('data-npc-type', npcType);
+      
+      // 设置对话内容
+      let avatarSrc = '';
+      if (npcType === 'emperor') {
+        avatarSrc = 'images/皇上.webp';
+      } else if (npcType === 'queen') {
+        avatarSrc = 'images/皇后.webp';
+      } else if (npcType === 'concubine') {
+        avatarSrc = 'images/华妃.webp';
+      } else if (npcType === 'friend') {
+        avatarSrc = 'images/沈眉庄.png';
+      } else if (npcType === 'maid') {
+        avatarSrc = 'images/侍女.webp';
+      } else  if(npcType === '管事嬷嬷'){
+        avatarSrc = 'images/管教嬷嬷.webp';
+      }
+      
+      dialogContainer.querySelector('.dialog-avatar').src = avatarSrc;
+      dialogContainer.querySelector('.dialog-name').textContent = name;
+      dialogContainer.querySelector('.dialog-text').textContent = text;
+      
+      // 设置对话选项
+      const optionsContainer = dialogContainer.querySelector('.dialog-options');
+      optionsContainer.innerHTML = '';
+      
+      options.forEach(option => {
+        const optionElement = document.createElement('div');
+        optionElement.classList.add('dialog-option');
+        optionElement.textContent = option;
+        optionsContainer.appendChild(optionElement);
+      });
+      
+      // 显示对话
+      dialogContainer.classList.add('show');
+      
+      // 设置回调函数
+      dialogContainer.callback = callback;
+    }
+    
+    // 处理对话选项
+    function handleDialogOption(userData, npcType, option) {
+      // 根据NPC类型和选项处理不同的结果
+      if (npcType === 'emperor') {
+        if (option === '臣妾参见皇上。') {
+          showEventNotification('皇帝好感度+5', '皇帝对你的印象不错。');
+          userData.relationships.emperor += 5;
+        } else if (option === '皇上万岁万岁万万岁。') {
+          showEventNotification('皇帝好感度+3', '皇帝觉得你很懂规矩。');
+          userData.relationships.emperor += 3;
+        } else {
+          showEventNotification('皇帝好感度-2', '皇帝觉得你过于胆怯。');
+          userData.relationships.emperor -= 2;
+        }
+      } else if (npcType === 'concubine') {
+        if (option === '参见华妃娘娘。') {
+          showEventNotification('华妃好感度+2', '华妃对你的态度有所缓和。');
+          userData.relationships.concubine1 += 2;
+        } else if (option === '臣妾只是随意逛逛。') {
+          showEventNotification('华妃好感度-3', '华妃觉得你在敷衍她。');
+          userData.relationships.concubine1 -= 3;
+        } else {
+          showEventNotification('华妃好感度-10', '华妃对你产生了敌意。');
+          userData.relationships.concubine1 -= 10;
+        }
+      } else if (npcType === 'maid') {
+        if (option === '我要休息。') {
+          showEventNotification('体质+2', '你好好休息了一下，感觉精神焕发。');
+          userData.attributes.constitution += 2;
+        } else if (option === '我要练习女红。') {
+          showEventNotification('容貌+3', '你的女红技艺有所提升。');
+          userData.attributes.beauty += 3;
+        } else {
+          showEventNotification('智慧+3', '你从书中获得了不少知识。');
+          userData.attributes.wisdom += 3;
+        }
+      } else if (npcType === 'friend') {
+        if (option === '姐姐！') {
+          showEventNotification('沈眉庄好感度+5', '沈眉庄很高兴见到你。');
+        } else if (option === '姐姐最近还好吗？') {
+          showEventNotification('沈眉庄好感度+3', '沈眉庄觉得你很关心她。');
+        } else {
+          showEventNotification('沈眉庄好感度+4', '沈眉庄收下了你的点心。');
+        }
+      }
+      
+      // 更新用户界面
+      updateUserInterface(userData);
+    }
+    
+    // 完成任务
+    function completeTask(userData, taskId) {
+      // 获取任务数据
+      const tasks = JSON.parse(localStorage.getItem('tasks')) || [
+        {
+          id: 'task1',
+          title: '初入宫闱',
+          type: 'main',
+          description: '前往储秀宫报道，认识管事嬷嬷',
+          requirements: { location: '储秀宫' },
+          rewards: { exp: 100, money: 200 },
+          status: 'available'
+        },
+        {
+          id: 'task2',
+          title: '研习女红',
+          type: 'daily',
+          description: '在自己的寝宫中练习女红1小时',
+          requirements: { location: 'own_room', time: 60 },
+          rewards: { exp: 50, attribute: { beauty: 2 } },
+          status: 'available'
+        }
+      ];
+      
+      // 查找任务
+      const task = tasks.find(t => t.id === taskId);
+      if (!task) return;
+      
+      // 标记任务为已完成
+      task.status = 'completed';
+      
+      // 添加到已完成任务列表
+      if (!userData.completedTasks.includes(taskId)) {
+        userData.completedTasks.push(taskId);
+      }
+      
+      // 移除当前任务
+      userData.currentTasks = userData.currentTasks.filter(id => id !== taskId);
+      
+      // 发放奖励
+      if (task.rewards.exp) {
+        userData.exp += task.rewards.exp;
+      }
+      
+      if (task.rewards.money) {
+        userData.money += task.rewards.money;
+      }
+      
+      if (task.rewards.attribute) {
+        for (const [key, value] of Object.entries(task.rewards.attribute)) {
+          if (userData.attributes[key] !== undefined) {
+            userData.attributes[key] += value;
+          }
+        }
+      }
+      
+      if (task.rewards.item) {
+        // 添加物品到背包
+        if (!userData.items) userData.items = [];
+        userData.items.push(task.rewards.item);
+      }
+      
+      // 检查是否升级
+      checkLevelUp(userData);
+      
+      // 更新用户界面
+      updateUserInterface(userData);
+      
+      // 保存任务数据
+      localStorage.setItem('tasks', JSON.stringify(tasks));
+      
+      // 显示任务完成通知
+      showEventNotification('任务完成', `恭喜你完成了任务"${task.title}"`);
+      
+      // 如果是主线任务，显示下一步剧情
+      if (task.type === 'main') {
+        if (taskId === 'task1') {
+          showDialog('管事嬷嬷', '管事嬷嬷', '很好，你已经完成了入宫的第一步。接下来，你需要学习宫廷礼仪。', [
+            '是，嬷嬷。',
+            '臣妾会努力学习的。'
+          ]);
+        }
+      }
+    }
+    
+    // 应用物品效果
+    function applyItemEffect(userData, itemName) {
+      if (itemName === '胭脂') {
+        userData.attributes.beauty += 5;
+      } else if (itemName === '诗集') {
+        userData.attributes.wisdom += 3;
+      } else if (itemName === '草药') {
+        userData.attributes.constitution += 2;
+      }
+      
+      // 更新用户界面
+      updateUserInterface(userData);
+    }
+    
+    // 检查升级
+    function checkLevelUp(userData) {
+      const expToNextLevel = userData.level * 100;
+      
+      if (userData.exp >= expToNextLevel) {
+        // 升级
+        userData.level += 1;
+        userData.exp -= expToNextLevel;
+        
+        // 提升属性
+        userData.attributes.beauty += 5;
+        userData.attributes.wisdom += 5;
+        userData.attributes.trickery += 3;
+        userData.attributes.constitution += 4;
+        
+        // 显示升级通知
+        showEventNotification('升级成功', `恭喜你升到了${userData.level}级！`);
+        
+        // 检查是否位分晋升
+        checkPositionPromotion(userData);
+      }
+    }
+    
+    // 检查位分晋升
+    function checkPositionPromotion(userData) {
+      const positionRequirements = [
+        { name: '秀女', level: 1, emperorFavor: 0, beauty: 50, wisdom: 50 },
+        { name: '答应', level: 3, emperorFavor: 50, beauty: 60, wisdom: 70 },
+        { name: '常在', level: 5, emperorFavor: 100, beauty: 80, wisdom: 80 },
+        { name: '贵人', level: 8, emperorFavor: 150, beauty: 90, wisdom: 85 },
+        { name: '嫔', level: 12, emperorFavor: 200, beauty: 95, wisdom: 90 },
+        { name: '妃', level: 15, emperorFavor: 300, beauty: 100, wisdom: 95 },
+        { name: '贵妃', level: 20, emperorFavor: 500, beauty: 120, wisdom: 100 },
+        { name: '皇贵妃', level: 25, emperorFavor: 800, beauty: 150, wisdom: 120 },
+        { name: '皇后', level: 30, emperorFavor: 1000, beauty: 200, wisdom: 150 }
+      ];
+      
+      // 从高到低检查是否满足晋升条件
+      for (let i = positionRequirements.length - 1; i >= 0; i--) {
+        const requirement = positionRequirements[i];
+        
+        if (userData.position === requirement.name) break;
+        
+        if (userData.level >= requirement.level &&
+            userData.relationships.emperor >= requirement.emperorFavor &&
+            userData.attributes.beauty >= requirement.beauty &&
+            userData.attributes.wisdom >= requirement.wisdom) {
+          
+          // 晋升位分
+          const oldPosition = userData.position;
+          userData.position = requirement.name;
+          
+          // 显示晋升通知
+          showEventNotification('位分晋升', `恭喜你从${oldPosition}晋升为${userData.position}！`);
+          
+          break;
+        }
+      }
+    }
+    
+    // 关闭所有模态框
+    function closeAllModals() {
+      document.querySelectorAll('.modal').forEach(modal => {
+        modal.classList.remove('show');
+      });
+    }
+  </script>
+</body>
+</html>
